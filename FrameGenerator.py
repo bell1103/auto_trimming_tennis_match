@@ -3,12 +3,12 @@ import sys
 import os
 import argparse
 
-from PySide2 import QtCore
-from PySide2.QtCore import QDir, Qt, QRectF, QPoint
-from PySide2.QtGui import QImage, QKeyEvent, QPainter, QPixmap, QColor, QPen, QFont
-from PySide2.QtWidgets import QApplication, QLabel, QMainWindow, QGraphicsScene, QGraphicsView, QGraphicsEllipseItem, QWidget
-from PySide2.QtWidgets import QHBoxLayout, QVBoxLayout, QPushButton
-from PySide2.QtWidgets import QFileDialog
+from PyQt5 import QtCore
+from PyQt5.QtCore import QDir, Qt, QRectF, QPoint
+from PyQt5.QtGui import QImage, QKeyEvent, QPainter, QPixmap, QColor, QPen, QFont
+from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QGraphicsScene, QGraphicsView, QGraphicsEllipseItem, QWidget
+from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QPushButton
+from PyQt5.QtWidgets import QFileDialog
 
 parser = argparse.ArgumentParser(description='Argument Parser for GridTrackNet')
 
@@ -86,4 +86,3 @@ cv2.destroyAllWindows()
 
 print("\nDone.")
 quit()
-

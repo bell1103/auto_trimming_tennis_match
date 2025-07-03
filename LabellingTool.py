@@ -3,13 +3,13 @@ import os
 import csv
 import argparse
 
-from PySide2 import QtCore
-from PySide2.QtCore import QDir, Qt, QRectF, QPoint, QPointF
-from PySide2.QtGui import QImage, QKeyEvent, QPainter, QPixmap, QColor, QPen, QFont, QBrush, QTransform
-from PySide2.QtWidgets import QApplication, QLabel, QMainWindow, QGraphicsScene, QGraphicsView, QGraphicsEllipseItem, QWidget
-from PySide2.QtWidgets import QHBoxLayout, QVBoxLayout, QPushButton, QGroupBox
-from PySide2.QtWidgets import QFileDialog, QGraphicsTextItem
-from PySide2.QtWidgets import QApplication, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem
+from PyQt5 import QtCore
+from PyQt5.QtCore import QDir, Qt, QRectF, QPoint, QPointF
+from PyQt5.QtGui import QImage, QKeyEvent, QPainter, QPixmap, QColor, QPen, QFont, QBrush, QTransform
+from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QGraphicsScene, QGraphicsView, QGraphicsEllipseItem, QWidget
+from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QPushButton, QGroupBox
+from PyQt5.QtWidgets import QFileDialog, QGraphicsTextItem
+from PyQt5.QtWidgets import QApplication, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem
 
 parser = argparse.ArgumentParser(description='Argument Parser for GridTrackNet')
 
@@ -133,7 +133,7 @@ class ImageViewer(QMainWindow):
         else:
             self.zoomLevel = self.zoomLevel / 1.2
             self.view.scale(1 / 1.2, 1 / 1.2)
-        return True
+        #return True
         
 
     def loadImages(self):
@@ -255,7 +255,6 @@ class ImageViewer(QMainWindow):
                 for i in range(len(self.images)):
                     if(self.states[i] == "VISIBLE"):
                         visibility = 1
-                        
                     else:
                         visibility = 0
                     

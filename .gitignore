@@ -1,0 +1,12 @@
+# Ignore Python virtual environments
+tf-env/
+venv*/
+__pycache__/
+*.pyc
+.DS_Store
+
+# Ignore datasets and large files
+dataset/
+generate_dataset/
+*.mp4
+*.avi
