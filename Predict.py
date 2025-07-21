@@ -4,6 +4,7 @@ import os
 import numpy as np
 import tensorflow as tf
 from GridTrackNet import GridTrackNet
+import json
 
 WIDTH = 768
 HEIGHT = 432
@@ -13,11 +14,18 @@ GRID_ROWS = 27
 GRID_SIZE_COL = WIDTH/GRID_COLS
 GRID_SIZE_ROW = HEIGHT/GRID_ROWS
 
-MODEL_DIR = os.path.join(os.getcwd(),"model_weights.h5")
-model = GridTrackNet(IMGS_PER_INSTANCE, HEIGHT, WIDTH)
-model.load_weights(MODEL_DIR)
 
-def getPredictions(frames, isBGRFormat = False):
+def create_model(model_path):
+    model = GridTrackNet(IMGS_PER_INSTANCE, HEIGHT, WIDTH)
+    model.load_weights(model_path)
+    return model
+
+   
+
+   
+
+
+def getPredictions(frames,model, isBGRFormat = False):
     outputHeight = frames[0].shape[0]
     outputWidth = frames[0].shape[1]
     
@@ -34,7 +42,6 @@ def getPredictions(frames, isBGRFormat = False):
             if(isBGRFormat):
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             frame = cv2.resize(frame,(WIDTH,HEIGHT))
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             frame = np.moveaxis(frame, -1, 0)
             unit.append(frame[0])
             unit.append(frame[1])
@@ -84,7 +91,108 @@ def getPredictions(frames, isBGRFormat = False):
     return ballCoordinates
 
 
-if __name__ == "__main__":  
+def run_inference(video_dir, model_dir=None, display_trail=True):
+    model = create_model(model_dir)
+
+    all_detections = []
+
+    cap = cv2.VideoCapture(video_dir)
+    if not cap.isOpened():
+        print("Error opening video file")
+        return
+
+    fps = int(cap.get(cv2.CAP_PROP_FPS))
+    if 57 <= fps <= 62:
+        numFramesSkip = 2
+    elif 22 <= fps <= 32:
+        numFramesSkip = 1
+    else:
+        print("ERROR: Video is not 30FPS or 60FPS")
+        return
+
+    totalFrames = (int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) // numFramesSkip)
+    frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+
+    directory, filename = os.path.split(video_dir)
+    output_dir = os.path.join(os.getcwd(), "output")
+    os.makedirs(output_dir, exist_ok=True)
+
+    name, extension = os.path.splitext(filename)
+    output_filename = name + "_Predicted" + extension
+    output_path = os.path.join(output_dir, output_filename)
+
+    outputFPS = fps if numFramesSkip == 1 else 30
+    video_writer = cv2.VideoWriter(output_path, fourcc, outputFPS, (frame_width, frame_height))
+
+    index = 0
+    frames = []
+    ballCoordinatesHistory = []
+    numPredicted = 0
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            print("\nDone")
+            break
+
+        if index % numFramesSkip == 0:
+            numPredicted += 1
+            frames.append(frame)
+            if len(frames) == 5:
+                ballCoordinates = getPredictions(frames, model, True)
+                for ball in ballCoordinates:
+                    ballCoordinatesHistory.append(ball)
+
+                for i, ball in enumerate(ballCoordinates):
+                    frame_num = index - len(frames) + i
+                    all_detections.append([frame_num, ball[0], ball[1]])
+
+                for i, frame in enumerate(frames):
+                    if i < len(ballCoordinates):
+                        if display_trail:
+                            if len(ballCoordinatesHistory) >= 15:
+                                for j in range(7, -1, -2):
+                                    idx = len(ballCoordinatesHistory) - 5 - j + i
+                                    cv2.circle(frame, ballCoordinatesHistory[idx], 4, (0, 255, 255), -1)
+                        else:
+                            cv2.circle(frame, ballCoordinates[i], 8, (0, 0, 255), 4)
+
+                        current_frame_number = index - len(frames) + i
+                        cv2.putText(
+                            frame,
+                            f"Frame: {current_frame_number}",
+                            (10, 30),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            2,
+                            (0, 0, 0),
+                            2,
+                            cv2.LINE_AA,
+                        )
+
+                        cv2.imshow('Output', frame)
+                    video_writer.write(frame)
+
+                frames = []
+
+        index += 1
+        percentage = numPredicted * 100 / totalFrames
+        print('Exporting...[%d%%]\r' % int(percentage), end="")
+
+    cap.release()
+    video_writer.release()
+
+    output_json_path = os.path.join(output_dir, name + "_coordinates.json")
+    with open(output_json_path, 'w') as json_file:
+        json.dump(all_detections, json_file)
+
+    cv2.destroyAllWindows()
+
+    return output_path, output_json_path, all_detections
+
+
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Argument Parser for GridTrackNet')
 
     parser.add_argument('--video_dir', required=True, type=str, help="Path to .mp4 video file.")
@@ -93,84 +201,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    VIDEO_DIR = args.video_dir
-    MODEL_DIR = args.model_dir 
-    DISPLAY_TRAIL = bool(args.display_trail)
+    run_inference(args.video_dir, args.model_dir, bool(args.display_trail))
+    
 
-    model.load_weights(MODEL_DIR)
-
-    cap = cv2.VideoCapture(VIDEO_DIR)
-
-    if not cap.isOpened():
-        print("Error opening video file")
-
-    fps = int(cap.get(cv2.CAP_PROP_FPS))
-    if(fps >= 57 and fps <= 62):
-        numFramesSkip = 2
-    elif (fps >= 22 and fps <= 32):
-        numFramesSkip = 1
-    else:
-        print("ERROR: Video is not 30FPS or 60FPS")
-        exit(0)
-
-    totalFrames = (int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) // numFramesSkip)
-
-    frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-
-    fourcc = cv2.VideoWriter_fourcc(*"mp4v")  
-
-    directory, filename = os.path.split(VIDEO_DIR)
-    name, extension = os.path.splitext(filename)
-    output_filename = name + " Predicted" + extension
-    output_path = os.path.join(directory, output_filename)
-
-    if(numFramesSkip == 1):
-        outputFPS = fps
-    else:
-        outputFPS = 30
-    video_writer = cv2.VideoWriter(output_path, fourcc, outputFPS, (frame_width, frame_height))
-
-    index = 0
-
-    frames = []
-    ballCoordinatesHistory = []
-    numPredicted = 0
-    while cap.isOpened():
-        ret, frame = cap.read()
-
-        if not ret:
-            print("\nDone")
-            break
-        
-        if(index % numFramesSkip == 0):
-            numPredicted += 1
-            frames.append(frame)
-            if(len(frames) == 5):
-                ballCoordinates = getPredictions(frames, True)
-                for ball in ballCoordinates:
-                    ballCoordinatesHistory.append(ball)
-                    
-                for i, frame in enumerate(frames):
-                    if(i < len(ballCoordinates)):
-                        if(DISPLAY_TRAIL):
-                            if(len(ballCoordinatesHistory) >= 15):
-                                for j in range(7,-1,-2):
-                                    idx = len(ballCoordinatesHistory)-5-j+i
-                                    cv2.circle(frame, ballCoordinatesHistory[idx], 4, (0, 255, 255),-1)
-                        else:
-                            cv2.circle(frame, ballCoordinates[i], 8, (0, 0, 255),4)
-
-                    video_writer.write(frame)
-
-                frames = []
-
-
-        index += 1
-        percentage = numPredicted*100/totalFrames
-        print('Exporting...[%d%%]\r'%int(percentage), end="")
-
-    cap.release()
-    video_writer.release()
-
-    cv2.destroyAllWindows()

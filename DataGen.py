@@ -169,7 +169,7 @@ for m in range(1, numMatchFolders+1):
                     print("\nERROR: Image not found at path: " + str(imgPath))
                     exit(1)
 
-        
+                print(f"Loading image: {imgPath}")
                 img = load_img(imgPath)
                 img = img_to_array(img)
 
