@@ -2,6 +2,8 @@ import json
 import math
 import argparse
 
+court_data = {}
+
 def distance(p1, p2):
     return math.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
 
@@ -10,6 +12,8 @@ def midpoint(p1, p2):
 
 def server_and_returner_position_ok (bboxes, target_pos, returner_left, returner_right, server_threshold, returner_threshold, server_pos):
     print(f"    DEBUG server_and_returner_position_ok: checking {len(bboxes)} player boxes")
+    global court_data
+
     
     for srv_idx, bbox in enumerate(bboxes):
         sx = (bbox[0] + bbox[2]) / 2
@@ -77,6 +81,8 @@ def server_and_returner_position_ok (bboxes, target_pos, returner_left, returner
     return False
 
 def detect_points_in_play(ball_positions, player_boxes, bounces, target_top, target_bottom, target_threshold_top, target_threshold_bottom, max_missing=30):
+    global court_data
+
     point_in_play = False
     missing_ball = 0
     missing_players = 0
@@ -150,27 +156,27 @@ def detect_points_in_play(ball_positions, player_boxes, bounces, target_top, tar
                 returner_left = court_data["top_left_single"]
                 returner_right = court_data["top_right_single"] 
             else:
-                print(f"  ❌ Bounce not near serve target at frame {frame} (top: {dist_to_top:.1f}, bottom: {dist_to_bottom:.1f})")
+                print(f"  Bounce not near serve target at frame {frame} (top: {dist_to_top:.1f}, bottom: {dist_to_bottom:.1f})")
                 print(f"    DEBUG: Neither condition met - this should not happen if dist_to_bottom <= target_threshold_bottom!")
 
             # Only proceed if we have a valid target position
             if target_pos is not None:
-                print(f"  → Checking player positions for {target_label} serve...")
-                print(f"    DEBUG: frame {frame} in player_boxes: {frame in player_boxes}")
+                # print(f"   Checking player positions for {target_label} serve...")
+                # print(f"    DEBUG: frame {frame} in player_boxes: {frame in player_boxes}")
                 if frame in player_boxes:
                     print(f"    DEBUG: player_boxes[{frame}] length: {len(player_boxes[frame])}")
                     print(f"    DEBUG: player_boxes[{frame}]: {player_boxes[frame]}")
                 
                 if frame in player_boxes and len(player_boxes[frame]) >= 2:
                     bboxes = player_boxes[frame]
-                    print(f"    DEBUG: Calling server_and_returner_position_ok with:")
-                    print(f"      bboxes: {bboxes}")
-                    print(f"      target_pos: {target_pos}")
-                    print(f"      returner_left: {returner_left}")
-                    print(f"      returner_right: {returner_right}")
-                    print(f"      server_threshold: {server_threshold}")
-                    print(f"      returner_threshold: {returner_threshold}")
-                    print(f"      target_label: {target_label}")
+                    # print(f"    DEBUG: Calling server_and_returner_position_ok with:")
+                    # print(f"      bboxes: {bboxes}")
+                    # print(f"      target_pos: {target_pos}")
+                    # print(f"      returner_left: {returner_left}")
+                    # print(f"      returner_right: {returner_right}")
+                    # print(f"      server_threshold: {server_threshold}")
+                    # print(f"      returner_threshold: {returner_threshold}")
+                    # print(f"      target_label: {target_label}")
                     
                     ok = server_and_returner_position_ok(bboxes, target_pos, returner_left, returner_right, server_threshold, returner_threshold, target_label)
                     print(f"    DEBUG: server_and_returner_position_ok returned: {ok}")
