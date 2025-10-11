@@ -6,7 +6,5 @@ __pycache__/
 .DS_Store
 
 # Ignore datasets and large files
-# dataset/
-# generate_dataset/
-# *.mp4
-# *.avi
+input/
+output/
