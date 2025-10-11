@@ -11,7 +11,7 @@ def midpoint(p1, p2):
     return [(p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2]
 
 def server_and_returner_position_ok (bboxes, target_pos, returner_left, returner_right, server_threshold, returner_threshold, server_pos):
-    print(f"    DEBUG server_and_returner_position_ok: checking {len(bboxes)} player boxes")
+    # print(f"    DEBUG server_and_returner_position_ok: checking {len(bboxes)} player boxes")
     global court_data
 
     
@@ -21,8 +21,8 @@ def server_and_returner_position_ok (bboxes, target_pos, returner_left, returner
         tx = target_pos[0]
         ty = target_pos[1]
         
-        print(f"      Player {srv_idx}: bbox={bbox}, center=({sx:.1f}, {sy:.1f})")
-        print(f"      Target position: ({tx:.1f}, {ty:.1f})")
+        # print(f"      Player {srv_idx}: bbox={bbox}, center=({sx:.1f}, {sy:.1f})")
+        # print(f"      Target position: ({tx:.1f}, {ty:.1f})")
 
         if server_pos == "top":
             server_threshold_y = 30
@@ -37,10 +37,7 @@ def server_and_returner_position_ok (bboxes, target_pos, returner_left, returner
             else:
                 side = "deuce"
         
-        # print(f"      Server side: {side}, server_pos: {server_pos}")
-        # print(f"      Server x distance to target: {abs(tx - sx):.1f}, threshold: {server_threshold}")
-        # print(f"      Server y distance to target: {abs(ty - sy):.1f}, threshold: {server_threshold_y}")
-        # print(f"      Server position check: x_ok={abs(tx - sx) <= server_threshold}, y_ok={abs(ty - sy) <= server_threshold_y}")
+        
         
         if abs(tx - sx) <= server_threshold and abs(ty - sy) <= server_threshold_y:
             r_idx = 1 - srv_idx
@@ -55,8 +52,7 @@ def server_and_returner_position_ok (bboxes, target_pos, returner_left, returner
             
             dist_left = distance((rcx, rcy), returner_left)
             dist_right = distance((rcx, rcy), returner_right)
-            # print(f"      Returner distances → left: {dist_left:.2f}, right: {dist_right:.2f}")
-            # print(f"      Returner threshold: {returner_threshold}")
+           
             
             # Check each condition separately for debugging
             cond1 = (server_pos == "top" and side == "deuce" and dist_right <= returner_threshold)
@@ -64,11 +60,7 @@ def server_and_returner_position_ok (bboxes, target_pos, returner_left, returner
             cond3 = (server_pos == "bottom" and side == "deuce" and dist_left <= returner_threshold)
             cond4 = (server_pos == "bottom" and side == "ad" and dist_right <= returner_threshold)
             
-            # print(f"      Condition checks:")
-            # print(f"        top+deuce+right: {cond1}")
-            # print(f"        top+ad+left: {cond2}")
-            # print(f"        bottom+deuce+left: {cond3}")
-            # print(f"        bottom+ad+right: {cond4}")
+            
             
             result = cond1 or cond2 or cond3 or cond4
             print(f"      Final result: {result}")
