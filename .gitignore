@@ -1,13 +1,4 @@
-# Ignore Python virtual environments
-tf-env/
-venv*/
-__pycache__/
-*.pyc
-.DS_Store
-
-# Ignore datasets and large files
-input/
+input_videos/
+output_videos/
 output/
 tf-env/
-__pycache__/
-*.pyc
