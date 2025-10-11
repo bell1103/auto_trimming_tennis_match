@@ -6,8 +6,8 @@ __pycache__/
 .DS_Store
 
 # Ignore datasets and large files
-echo "input/" >> .gitignore
-echo "output/" >> .gitignore
-echo "output_videos/" >> .gitignore
-git add .gitignore
-git commit -m "Ignore video folders"
+input/
+output/
+tf-env/
+__pycache__/
+*.pyc
