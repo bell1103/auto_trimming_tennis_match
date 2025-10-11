@@ -91,8 +91,8 @@ python main.py \
 
 
 ## Output
-Results (trimmed video + intermediate data) are saved in output/:
-```output/
+Results (trimmed video + intermediate data) are saved in output_video/:
+```output_video/
 ├── <your_video>_bounces.json
 ├── <your_video>_court_keypoints.json
 ├── <your_video>_players.json
