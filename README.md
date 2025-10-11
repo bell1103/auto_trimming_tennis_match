@@ -1,7 +1,7 @@
 # Auto-Trimming Tennis Match
 
 <p align="center">
-  <img src="![alt text](786A9DD4-7960-46E6-A814-0F84889DFF90_1_105_c.jpeg)" alt="image" style="display:block; margin:auto;" />
+  <img src="/Users/bellzhou/Desktop/GridTrackNet/PointViewTeam.jpeg" alt="image" style="display:block; margin:auto;" />
 </p>
 
  Automatically trims full tennis match recorind into highlight video as part of the developing tennis analytical website amied to make tennis more accessible by making self analysis easir. 
