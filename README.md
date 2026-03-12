@@ -1,8 +1,6 @@
 # Auto-Trimming Tennis Match
 
-<p align="center">
-  <img src="PointViewTeam.jpeg" alt="image" style="display:block; margin:auto;" />
-</p>
+
 
  Automatically trims full tennis match recording into highlight video as part of the developing tennis analytical website aimed to make tennis more accessible by making self analysis easier.
 
