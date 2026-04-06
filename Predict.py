@@ -104,10 +104,10 @@ def run_inference(video_dir, model_dir=None, display_trail=True):
     fps = int(cap.get(cv2.CAP_PROP_FPS))
     if 57 <= fps <= 62:
         numFramesSkip = 2
-    elif 22 <= fps <= 32:
+    elif 22 <= fps <= 33:
         numFramesSkip = 1
     else:
-        print("ERROR: Video is not 30FPS or 60FPS")
+        print("ERROR: Video is not 30FPS or 60FPS", fps)
         return
 
     totalFrames = (int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) // numFramesSkip)
